@@ -76,6 +76,15 @@ public class MainActivity extends SherlockActivity {
         }
     }
 
+    static class OkHttpStack extends HurlStack {
+        private final OkHttpClient mClient = new OkHttpClient();
+
+        @Override
+        protected HttpURLConnection createConnection(URL url) throws IOException {
+            return mClient.open(url);
+        }
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -83,15 +92,8 @@ public class MainActivity extends SherlockActivity {
         setContentView(R.layout.photo_stream);
 
         mBase = (LinearLayout) findViewById(R.id.base);
-        mVolley = Volley.newRequestQueue(getApplicationContext(), new HurlStack() {
-            final OkHttpClient mClient = new OkHttpClient();
-
-            @Override
-            protected HttpURLConnection createConnection(URL url) throws IOException {
-                return mClient.open(url);
-            }
-        }); // thread
-            // pool(4)
+        mVolley = Volley.newRequestQueue(getApplicationContext(), new OkHttpStack()); // thread
+                                                                                      // pool(4)
         startLoadingAnim();
         refreshDatas();
     }
