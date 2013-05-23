@@ -43,7 +43,6 @@ import android.widget.Toast;
 
 public class MainActivity extends SherlockActivity {
 
-    private static final String INSTAGRAM_CLIENT_ID = "2954ec574e53454abefc82073af058c2";
     private static final Object TAG = new Object();
     private static final String LOG = "VOLLEY-SAMPLE";
     private RequestQueue mVolley;
@@ -99,8 +98,7 @@ public class MainActivity extends SherlockActivity {
     }
 
     private void refreshDatas() {
-        String url = "https://api.instagram.com/v1/media/popular?client_id="
-                + INSTAGRAM_CLIENT_ID;
+        String url = "https://picasaweb.google.com/data/feed/api/user/117758246455073005073/albumid/5881235953426455569?alt=json";
         JsonObjectRequest jsonRequet = new JsonObjectRequest(Method.GET, url,
                 null, new Listener<JSONObject>() {
                     public void onResponse(JSONObject result) {
@@ -124,8 +122,7 @@ public class MainActivity extends SherlockActivity {
     }
 
     private int parseJson(JSONObject root) throws JSONException {
-        int code = root.getJSONObject("meta").getInt("code");
-        if (code == 200) {
+        if (true) {
             int[] resTexts = { R.id.photo_text1, R.id.photo_text2,
                     R.id.photo_text3, R.id.photo_text4, R.id.photo_text5,
                     R.id.photo_text6 };
@@ -134,7 +131,7 @@ public class MainActivity extends SherlockActivity {
             int resIndex = 0;
             LayoutInflater inf = (LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE);
 
-            JSONArray arr = root.getJSONArray("data");
+            JSONArray arr = root.getJSONObject("feed").getJSONArray("entry");
             final int len = arr.length();
             RelativeLayout rl = (RelativeLayout) inf.inflate(
                     R.layout.photo_item, null);
@@ -143,9 +140,9 @@ public class MainActivity extends SherlockActivity {
                 JSONObject json = arr.getJSONObject(i);
                 String text = null;
                 try {
-                    JSONObject caption = json.getJSONObject("caption");
+                    JSONObject caption = json.getJSONObject("title");
                     if (caption != null) {
-                        text = caption.getString("text");
+                        text = caption.getString("$t");
                     } else {
                         text = "...";
                     }
@@ -154,8 +151,7 @@ public class MainActivity extends SherlockActivity {
                     Log.e(LOG, json.toString());
                     text = "...";
                 }
-                String imgUrl = json.getJSONObject("images")
-                        .getJSONObject("low_resolution").getString("url");
+                String imgUrl = json.getJSONObject("content").getString("src");
 
                 ImageView iv = (ImageView) rl.findViewById(resImgs[resIndex]);
                 if (iv == null) {
@@ -195,7 +191,7 @@ public class MainActivity extends SherlockActivity {
                 mVolley.add(request);
             }
         }
-        return code;
+        return 200;
     }
 
     public void onStop() {
