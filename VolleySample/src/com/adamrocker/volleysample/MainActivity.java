@@ -3,12 +3,18 @@ package com.adamrocker.volleysample;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.net.URL;
+
 import com.android.volley.Request.Method;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.Response.ErrorListener;
 import com.android.volley.Response.Listener;
 import com.android.volley.VolleyError;
+import com.android.volley.toolbox.HurlStack;
 import com.android.volley.toolbox.ImageRequest;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
@@ -16,8 +22,9 @@ import com.actionbarsherlock.app.SherlockActivity;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
 import com.adamrocker.volleysample.R;
+import com.squareup.okhttp.OkHttpClient;
+
 import android.os.Bundle;
-import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.Config;
@@ -76,8 +83,15 @@ public class MainActivity extends SherlockActivity {
         setContentView(R.layout.photo_stream);
 
         mBase = (LinearLayout) findViewById(R.id.base);
-        mVolley = Volley.newRequestQueue(getApplicationContext());// thread
-                                                                  // pool(4)
+        mVolley = Volley.newRequestQueue(getApplicationContext(), new HurlStack() {
+            final OkHttpClient mClient = new OkHttpClient();
+
+            @Override
+            protected HttpURLConnection createConnection(URL url) throws IOException {
+                return mClient.open(url);
+            }
+        }); // thread
+            // pool(4)
         startLoadingAnim();
         refreshDatas();
     }
