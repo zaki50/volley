@@ -31,3 +31,5 @@ VolleySample/proguard/
 *.ipr
 *.iws
 .idea/
+
+bin/
